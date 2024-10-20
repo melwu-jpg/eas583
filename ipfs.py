@@ -29,7 +29,9 @@ def get_from_ipfs(cid,content_type="json"):
 
 	response.raise_for_status()
 
-	data = response.json()
+	raw_data = response.json()
+
+	data = data.get("raw_data")
 
 	assert isinstance(data,dict), f"get_from_ipfs should return a dict"
 	return data
