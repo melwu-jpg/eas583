@@ -1,9 +1,12 @@
 import random
+import time
 import json
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
 from web3.providers.rpc import HTTPProvider
 
+request_count = 0
+start_time = time.time()
 
 # If you use one of the suggested infrastructure providers, the url will be of the form
 # now_url  = f"https://eth.nownodes.io/{now_token}"
@@ -44,6 +47,7 @@ def is_ordered_block(w3, block_num):
 
 	Conveniently, most type 2 transactions set the gasPrice field to be min( tx.maxPriorityFeePerGas + block.baseFeePerGas, tx.maxFeePerGas )
 	"""
+	global request_count, start_time
 	block = w3.eth.get_block(block_num)
 	ordered = False
 	transactions = block['transactions']
@@ -52,22 +56,34 @@ def is_ordered_block(w3, block_num):
 	priority_fees = []
 
 	for tx_hash in transactions:
-		tx = w3.eth.get_transaction(tx_hash)
 		
-		if tx['type'] == 2:
-			max_priority_fee = tx['maxPriorityFeePerGas']
-			max_fee_per_gas = tx['maxFeePerGas']
+		if request_count >= 5:
+			time.sleep(1 - (time.time() - start_time))
+			request_count = 0
+			start_time = time.time()
+		
+		try:
+			tx = w3.eth.get_transaction(tx_hash)
+			request_count += 1
+			if tx['type'] == 2:
+				max_priority_fee = tx['maxPriorityFeePerGas']
+				max_fee_per_gas = tx['maxFeePerGas']
+				if base_fee_per_gas is not None:
+					priority_fee = min(max_priority_fee, max_fee_per_gas - base_fee_per_gas)
+				else: return False
 
-			if base_fee_per_gas is not None:
-				priority_fee = min(max_priority_fee, max_fee_per_gas - base_fee_per_gas)
+			else: 
+				priority_fee = tx['gasPrice'] - base_fee_per_gas if base_fee_per_gas else tx['gasPrice']
 
-			else: return False
+			priority_fees.append(priority_fee) #Append the priority fees
 
-		else: 
-			priority_fee = tx['gasPrice'] - base_fee_per_gas if base_fee_per_gas else tx['gasPrice']
-
-		priority_fees.append(priority_fee) #Append the priority fees
-
+		except Exception as e:
+			if "429" in str(e):
+				time.sleep(5)
+				continue
+			else:
+				raise e
+				
 	ordered = all(priority_fees[i] >= priority_fees[i + 1] for i in range(len(priority_fees) - 1)) #Check if ordered
 
 	return ordered
