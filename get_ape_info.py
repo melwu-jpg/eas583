@@ -24,7 +24,7 @@ web3 = Web3(provider)
 def get_ape_info(apeID):
 	assert isinstance(apeID,int), f"{apeID} is not an int"
 	assert 1 <= apeID, f"{apeID} must be at least 1"
-  assert 1 <= apeID < 10000, f"{apeID} must be between 1 and 9999"
+	assert 1 <= apeID < 10000, f"{apeID} must be between 1 and 9999"
 
 	data = {'owner': "", 'image': "", 'eyes': "" }
 	
