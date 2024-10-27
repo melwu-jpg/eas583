@@ -46,24 +46,21 @@ def is_ordered_block(w3, block_num):
 	"""
 	block = w3.eth.get_block(block_num)
 	ordered = False
-
-	# TODO YOUR CODE HERE
-  base_fee_per_gas = block['baseFeePerGas']
-  transactions = block['transactions']
+	
+	base_fee_per_gas = block['baseFeePerGas']
+	transactions = block['transactions']
 
 	priority_fees = []
 
 	for tx_hash in transactions:
-        tx = w3.eth.get_transaction(tx_hash)
-
-        if tx['type'] == 0:  # Type 0 trx
-            priority_fee = tx['gasPrice'] - base_fee_per_gas
-        elif tx['type'] == 2:  # Type 2 trx
-            priority_fee = min(tx['maxPriorityFeePerGas'], tx['maxFeePerGas'] - base_fee_per_gas)
-        else:
-            continue 
-
-        priority_fees.append(priority_fee) #Append the priority fees
+		tx = w3.eth.get_transaction(tx_hash)
+		
+		if tx['type'] == 0:  # Type 0 trx
+			priority_fee = tx['gasPrice'] - base_fee_per_gas
+		elif tx['type'] == 2:  # Type 2 trx
+			priority_fee = min(tx['maxPriorityFeePerGas'], tx['maxFeePerGas'] - base_fee_per_gas)
+		else: continue 
+		priority_fees.append(priority_fee) #Append the priority fees
 
 	ordered = all(priority_fees[i] >= priority_fees[i + 1] for i in range(len(priority_fees) - 1)) #Check if ordered
 
@@ -86,14 +83,13 @@ def get_contract_values(contract, admin_address, owner_address):
 	"""
 	default_admin_role = int.to_bytes(0, 32, byteorder="big")
 
-	# TODO complete the following lines by performing contract calls
 	# Get and return the merkleRoot from the provided contract
 	onchain_root = contract.functions.merkleRoot().call() 
 	# Check the contract to see if the address "admin_address" has the role "default_admin_role"
 	has_role = contract.functions.hasRole(default_admin_role, admin_address).call()
 	# Call the contract to get the prime owned by "owner_address"
 	prime = contract.functions.getPrimeByOwner(owner_address).call()
-	
+
 	return onchain_root, has_role, prime
 
 
