@@ -46,20 +46,26 @@ def is_ordered_block(w3, block_num):
 	"""
 	block = w3.eth.get_block(block_num)
 	ordered = False
-	
-	base_fee_per_gas = block['baseFeePerGas']
 	transactions = block['transactions']
+	base_fee_per_gas = block.get('baseFeePerGas', None)
 
 	priority_fees = []
 
 	for tx_hash in transactions:
 		tx = w3.eth.get_transaction(tx_hash)
 		
-		if tx['type'] == 0:  # Type 0 trx
-			priority_fee = tx['gasPrice'] - base_fee_per_gas
-		elif tx['type'] == 2:  # Type 2 trx
-			priority_fee = min(tx['maxPriorityFeePerGas'], tx['maxFeePerGas'] - base_fee_per_gas)
-		else: continue 
+		if tx['type'] == 2:
+			max_priority_fee = tx['maxPriorityFeePerGas']
+			max_fee_per_gas = tx['maxFeePerGas']
+
+			if base_fee_per_gas is not None:
+				priority_fee = min(max_priority_fee, max_fee_per_gas - base_fee_per_gas)
+
+			else: return False
+
+		else: 
+			priority_fee = tx['gasPrice'] - base_fee_per_gas if base_fee_per_gas else tx['gasPrice']
+
 		priority_fees.append(priority_fee) #Append the priority fees
 
 	ordered = all(priority_fees[i] >= priority_fees[i + 1] for i in range(len(priority_fees) - 1)) #Check if ordered
