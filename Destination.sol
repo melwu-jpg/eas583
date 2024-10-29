@@ -35,14 +35,13 @@ contract Destination is AccessControl {
 		BridgeToken wrappedToken = BridgeToken(_wrapped_token);
 		require(wrappedToken.balanceOf(msg.sender) >= _amount, "Insufficient balance");
 
-		wrappedToken.burn(msg.sender, _amount);
-
+		wrappedToken.burnFrom(msg.sender, _amount);
 		emit Unwrap(wrapped_tokens[_wrapped_token], _wrapped_token, msg.sender, _recipient, _amount); 
 
 	}
 
 	function createToken(address _underlying_token, string memory name, string memory symbol ) public onlyRole(CREATOR_ROLE) returns(address) {
-		BridgeToken newToken = new BridgeToken(name, symbol, _underlying_token);
+		BridgeToken newToken = new BridgeToken(_underlying_token, name, symbol, admin);
 				
 		underlying_tokens[_underlying_token] = address(newToken);
 		wrapped_tokens[address(newToken)] = _underlying_token;
