@@ -40,7 +40,7 @@ contract Destination is AccessControl {
 
 	}
 
-	function createToken(address _underlying_token, string memory name, string memory symbol ) public onlyRole(CREATOR_ROLE) returns(address) {
+	function createToken(address _underlying_token, string memory name, string memory symbol, address admin) public onlyRole(CREATOR_ROLE) returns(address) {
 		BridgeToken newToken = new BridgeToken(_underlying_token, name, symbol, admin);
 				
 		underlying_tokens[_underlying_token] = address(newToken);
