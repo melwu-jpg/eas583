@@ -21,8 +21,7 @@ nft_contract = w3.eth.contract(address=contract_address, abi=abi)
 
 def claim_nft(wallet_address, nonce):
     # Convert nonce to bytes32
-    nonce_bytes32 = w3.keccak(text=str(nonce)).hex()  
-    nonce_bytes32 = '0x' + nonce_bytes32.rjust(64, '0') 
+    nonce_bytes32 = w3.toBytes(nonce)  
 
     gas_price_wei = 100 * (10 ** 9)
 
