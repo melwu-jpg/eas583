@@ -23,33 +23,44 @@ contract Destination is AccessControl {
     }
 
 	function wrap(address _underlying_token, address _recipient, uint256 _amount ) public onlyRole(WARDEN_ROLE) {
-		address wrappedToken = underlying_tokens[_underlying_token];
-		require(wrappedToken != address(0), "Token not registered");
+		// token has been registered?
+		address wrappedTokenAddress = underlying_tokens[_underlying_token];
+		
+		// get BridgeToken contract associated with the token
+		BridgeToken wrappedToken = BridgeToken(wrappedTokenAddress);
+		
+		// mint the wrapped tokens
+		wrappedToken.mint(_recipient, _amount);
+		
+		// emit the wrap event
+		emit Wrap(_underlying_token, wrappedTokenAddress, _recipient, _amount);
 
-		BridgeToken(wrappedToken).mint(_recipient, _amount);
-
-		emit Wrap(_underlying_token, wrappedToken, _recipient, _amount);
 	}
 
 	function unwrap(address _wrapped_token, address _recipient, uint256 _amount ) public {
-		BridgeToken wrappedToken = BridgeToken(_wrapped_token);
-		require(wrappedToken.balanceOf(msg.sender) >= _amount, "Insufficient balance");
 
+		// caller is the owner of the wrapped tokens?
+		BridgeToken wrappedToken = BridgeToken(_wrapped_token);
+
+		// burn the specified amount of wrapped tokens
 		wrappedToken.burnFrom(msg.sender, _amount);
-		emit Unwrap(wrapped_tokens[_wrapped_token], _wrapped_token, msg.sender, _recipient, _amount); 
+
+		// emit the unwrap event
+		emit Unwrap(wrappedToken.underlying(), _wrapped_token, msg.sender, _recipient, _amount);
 
 	}
 
-	function createToken(address _underlying_token, string memory name, string memory symbol, address admin) public onlyRole(CREATOR_ROLE) returns(address) {
+	function createToken(address _underlying_token, string memory name, string memory symbol, address admin) public onlyRole(CREATOR_ROLE) returns() {
 		BridgeToken newToken = new BridgeToken(_underlying_token, name, symbol, admin);
-				
+		// Store to wrapped token
 		underlying_tokens[_underlying_token] = address(newToken);
 		wrapped_tokens[address(newToken)] = _underlying_token;
-		tokens.push(address(newToken));
-
+		
+		// Emit Creation event
 		emit Creation(_underlying_token, address(newToken));
-        
-    return address(newToken);
+    
+		return address(newToken);
+
 	}
 
 }
