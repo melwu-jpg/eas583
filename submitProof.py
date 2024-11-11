@@ -91,15 +91,19 @@ def build_merkle(leaves):
     #TODO YOUR CODE HERE
     tree = [leaves]
 
+    # Continue building levels until there's only one hash (the root)
     while len(tree[-1]) > 1:
         parent_level = []
+        
         for i in range(0, len(tree[-1]), 2):
             a = tree[-1][i]
-            b = tree[-1][i + 1] if i + 1 < len(tree[-1]) else a  
+            # Duplicate last element if the number of elements is odd
+            b = tree[-1][i + 1] if i + 1 < len(tree[-1]) else a
             parent_level.append(hash_pair(a, b))
+        
         tree.append(parent_level)
 
-    return tree[-1][0]
+    return tree
 
 
 def prove_merkle(merkle_tree, random_indx):
@@ -113,12 +117,13 @@ def prove_merkle(merkle_tree, random_indx):
     # TODO YOUR CODE HERE
 
     for level in range(len(merkle_tree) - 1):
-        idx = random_indx // 2 
+        idx = random_indx // 2
         if random_indx % 2 == 0:
-            merkle_proof.append(merkle_tree[level][idx + 1])
-        else: 
+            merkle_proof.append(merkle_tree[level][idx + 1] if idx + 1 < len(merkle_tree[level]) else merkle_tree[level][idx])
+        else:
             merkle_proof.append(merkle_tree[level][idx])
-        random_indx //= 2 
+
+        random_indx //= 2
 
     return merkle_proof
 
