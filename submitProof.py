@@ -111,18 +111,20 @@ def prove_merkle(merkle_tree, random_indx):
     """
     merkle_proof = []
     # TODO YOUR CODE HERE
-
-    for level in range(len(merkle_tree) - 1):
+    for level in range(len(merkle_tree) - 1):  
         idx = random_indx // 2
-        if random_indx % 2 == 0:
-            merkle_proof.append(merkle_tree[level][idx + 1] if idx + 1 < len(merkle_tree[level]) else merkle_tree[level][idx])
-        else:
-            merkle_proof.append(merkle_tree[level][idx])
 
-        random_indx //= 2
+        if random_indx % 2 == 0:
+            sibling_leaf = merkle_tree[level][idx + 1] if idx + 1 < len(merkle_tree[level]) else merkle_tree[level][idx]
+            merkle_proof.append(sibling_leaf)
+        else:
+ 
+            sibling_leaf = merkle_tree[level][idx]
+            merkle_proof.append(sibling_leaf)
+
+        random_indx //= 2 
 
     return merkle_proof
-
 
 def sign_challenge(challenge):
     """
@@ -138,12 +140,12 @@ def sign_challenge(challenge):
     eth_sk = acct.key
 
     # TODO YOUR CODE HERE
-    eth_encoded_msg = eth_account.messages.encode_defunct(text=challenge)
-    eth_sig_obj = eth_account.Account.sign_message(eth_encoded_msg, eth_sk)
+    message = encode_defunct(text=challenge)
+    signed_message = account.sign_message(message)
 
-    # eth_sig_obj = 'placeholder'
+    assert isinstance(signed_message, eth_account.datastructures.SignedMessage)
 
-    return addr, eth_sig_obj.signature.hex()
+    return addr, signed_message
 
 
 def send_signed_msg(proof, random_leaf):
@@ -159,7 +161,6 @@ def send_signed_msg(proof, random_leaf):
     w3 = connect_to(chain)
 
     # TODO YOUR CODE HERE
-    # tx_hash = 'placeholder'
 
     contract = w3.eth.contract(address=address, abi=abi)
 
@@ -167,8 +168,8 @@ def send_signed_msg(proof, random_leaf):
         'chainId': 97, 
         'gas': 2000000,
         'gasPrice': w3.toWei('5', 'gwei'),
-        'nonce': w3.eth.get_transaction_count(address),
-        'from': address  
+        'nonce': w3.eth.get_transaction_count(acct.address),
+        'from': acct.address  
     })
 
     signed_tx = w3.eth.account.sign_transaction(tx, acct.key)
