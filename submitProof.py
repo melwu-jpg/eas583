@@ -138,12 +138,11 @@ def sign_challenge(challenge):
     eth_sk = acct.key
 
     # TODO YOUR CODE HERE
-    message = encode_defunct(text=challenge)
-    signed_message = account.sign_message(message)
+    w3 = Web3()
 
-    assert isinstance(signed_message, eth_account.datastructures.SignedMessage)
+    signed_message = w3.eth.account.sign_message( challenge, private_key = acct._private_key)
 
-    return addr, signed_message
+    return addr, signed_message.signature
 
 
 def send_signed_msg(proof, random_leaf):
@@ -164,10 +163,10 @@ def send_signed_msg(proof, random_leaf):
 
     tx = contract.functions.submit(proof, random_leaf).buildTransaction({
         'chainId': 97, 
-        'gas': 2000000,
+        'gas': 1000000,
         'gasPrice': w3.toWei('5', 'gwei'),
-        'nonce': w3.eth.get_transaction_count(acct.address),
-        'from': acct.address  
+        'nonce': w3.eth.get_transaction_count(address),
+        'from': address  
     })
 
     signed_tx = w3.eth.account.sign_transaction(tx, acct.key)
