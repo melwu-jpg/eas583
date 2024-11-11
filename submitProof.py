@@ -75,8 +75,6 @@ def convert_leaves(primes_list):
 
     return leaves
 
-    return leaves
-
 
 def build_merkle(leaves):
     """
