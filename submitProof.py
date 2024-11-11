@@ -48,7 +48,7 @@ def generate_primes(num_primes):
     primes_list = []
 
     #TODO YOUR CODE HERE
-    x = [True] * (84017)
+    x = [True] * (num_primes * 15)
     x[0] = x[1] = False # 0 and 1 are not primes
 
     for num in range(2, len(x)):
@@ -68,7 +68,20 @@ def convert_leaves(primes_list):
     """
 
     # TODO YOUR CODE HERE
-    return [Web3.toBytes(prime).rjust(32, b'\0') for prime in primes_list]
+    leaves = []
+    for prime in primes_list:
+        # Convert prime to bytes (Web3 toBytes or Python bytes method)
+        bytes_prime = w3.toBytes(prime)  # Web3 toBytes (may work if you're using an older version)
+        
+        # If Web3.toBytes doesn't work (in case of newer Web3 versions), use:
+        if bytes_prime is None:
+            bytes_prime = bytes(str(prime), encoding='utf-8')
+        
+        # Ensure the byte array is 32 bytes long (padded with 0s if necessary)
+        padded_bytes = bytes_prime.ljust(32, b'\0')[:32]  # Pad to 32 bytes and truncate if needed
+        leaves.append(padded_bytes)
+
+    return leaves
 
 
 def build_merkle(leaves):
@@ -80,15 +93,19 @@ def build_merkle(leaves):
     """
 
     #TODO YOUR CODE HERE
-    tree = []
-
+    tree = [leaves]  # Starting from the leaf level
     while len(tree[-1]) > 1:
         parent_level = []
         for i in range(0, len(tree[-1]), 2):
             a = tree[-1][i]
-            b = tree[-1][i + 1] if i + 1 < len(tree[-1]) else a 
+            b = tree[-1][i + 1] if i + 1 < len(tree[-1]) else a  # Handle odd number of leaves
             parent_level.append(hash_pair(a, b))
         tree.append(parent_level)
+    return tree[-1][0]  # Return the root hash
+
+    # Check if leaves is empty or contains only one element
+    if not leaves or len(leaves) == 1:
+        raise ValueError("Leaves list is empty or too small to build Merkle tree.")
     
     return tree
 
