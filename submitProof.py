@@ -115,7 +115,7 @@ def prove_merkle(merkle_tree, random_indx):
         if random_indx % 2 == 0: #if even
             sibling_leaf = merkle_tree[level][idx + 1] if (idx + 1) < len(merkle_tree[level]) else None
         else: #if odd
-            sibling_leaf = merkle_tree[level][idx] if idx > 0 else None
+            sibling_leaf = merkle_tree[level][idx-1] if idx > 0 else None
 
         if sibling_leaf is not None:
             pair = [merkle_tree[level][random_indx], sibling_leaf]
