@@ -109,19 +109,18 @@ def prove_merkle(merkle_tree, random_indx):
     """
     merkle_proof = []
     # TODO YOUR CODE HERE
-    for level in range(len(merkle_tree) - 1):  
+    for level in range(len(merkle_tree) - 1):
         idx = random_indx // 2
-
+        
         if random_indx % 2 == 0:
-            sibling_leaf = merkle_tree[level][idx + 1] if idx + 1 < len(merkle_tree[level]) else None
-            if sibling_leaf:
-                merkle_proof.append(sibling_leaf)
+            sibling_leaf = merkle_tree[level][idx + 1] if (idx + 1) < len(merkle_tree[level]) else None
         else:
- 
-            sibling_leaf = merkle_tree[level][idx]
+            sibling_leaf = merkle_tree[level][idx] if idx > 0 else None
+
+        if sibling_leaf is not None:
             merkle_proof.append(sibling_leaf)
 
-        random_indx //= 2 
+        random_indx //= 2
 
     return merkle_proof
 
