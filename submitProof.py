@@ -70,12 +70,10 @@ def convert_leaves(primes_list):
     # TODO YOUR CODE HERE
     leaves = []
     for prime in primes_list:
+        bytes_prime = prime.to_bytes(32, byteorder='big')
+        leaves.append(bytes_prime)
 
-        bytes_prime = bytes(str(prime), encoding='utf-8')
-
-        padded_bytes = bytes_prime.ljust(32, b'\0')[:32]
-        leaves.append(padded_bytes)
-
+    return leaves
 
     return leaves
 
