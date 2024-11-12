@@ -5,7 +5,8 @@ import json
 from pathlib import Path
 from web3 import Web3
 from web3.middleware import geth_poa_middleware  # Necessary for POA chains
-
+import hashlib
+from pymerkletools import MerkleTools
 
 def merkle_assignment():
     """
@@ -109,18 +110,17 @@ def prove_merkle(merkle_tree, random_indx):
     """
     merkle_proof = []
     # TODO YOUR CODE HERE
-    for level in range(len(merkle_tree) - 1):
-        idx = random_indx // 2
+    for level in range(len(merkle_tree) - 1): #start at leaf level and go up each level up until the root (not including root)
+        idx = random_indx
         
-        if random_indx % 2 == 0: #if even
+        if random_indx % 2 == 0: #if even, then sibling is on the right
             sibling_leaf = merkle_tree[level][idx + 1] if (idx + 1) < len(merkle_tree[level]) else None
-        else: #if odd
-            sibling_leaf = merkle_tree[level][idx-1] if idx > 0 else None
+        else: #if odd, then sibling is on the left
+            sibling_leaf = merkle_tree[level][idx - 1] if idx > 0 else None
 
+        #sorting?
         if sibling_leaf is not None:
-            pair = [merkle_tree[level][random_indx], sibling_leaf]
-            pair.sort()
-            merkle_proof.append(pair[1]) 
+          merkle_proof.append(sibling_leaf)
 
         random_indx //= 2
 
