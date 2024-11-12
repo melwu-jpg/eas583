@@ -23,39 +23,36 @@ contract Destination is AccessControl {
     }
 
 	function wrap(address _underlying_token, address _recipient, uint256 _amount ) public onlyRole(WARDEN_ROLE) {
-		// token has been registered?
-		address wrappedTokenAddress = underlying_tokens[_underlying_token];
-		
-		// get BridgeToken contract associated with the token
-		BridgeToken wrappedToken = BridgeToken(wrappedTokenAddress);
-		
+
 		// mint the wrapped tokens
-		wrappedToken.mint(_recipient, _amount);
+		BridgeToken(wrapped_tokens[_underlying_token]).mint(_recipient, _amount);
 		
 		// emit the wrap event
-		emit Wrap(_underlying_token, wrappedTokenAddress, _recipient, _amount);
+		emit Wrap(_underlying_token, wrapped_tokens[_underlying_token], _recipient, _amount);
 
 	}
 
 	function unwrap(address _wrapped_token, address _recipient, uint256 _amount ) public {
 
-		// caller is the owner of the wrapped tokens?
-		BridgeToken wrappedToken = BridgeToken(_wrapped_token);
-
 		// burn the specified amount of wrapped tokens
-		wrappedToken.burnFrom(msg.sender, _amount);
+		BridgeToken(_wrapped_token).burnFrom(msg.sender, _amount);
 
 		// emit the unwrap event
-		emit Unwrap(wrappedToken.underlying(), _wrapped_token, msg.sender, _recipient, _amount);
+		emit Unwrap(underlying_tokens[_wrapped_token], _wrapped_token, msg.sender, _recipient, _amount);
 
 	}
 
-	function createToken(address _underlying_token, string memory name, string memory symbol,address admin) public onlyRole(CREATOR_ROLE) returns(address) {
-		BridgeToken newToken = new BridgeToken(_underlying_token, name, symbol, admin);
-		// Store to wrapped token
-		underlying_tokens[_underlying_token] = address(newToken);
-		wrapped_tokens[address(newToken)] = _underlying_token;
+	function createToken(address _underlying_token, string memory name, string memory symbol) public onlyRole(CREATOR_ROLE) returns(address) {
 		
+    BridgeToken newToken = new BridgeToken(_underlying_token, name, symbol,address(this));
+
+		// Store to wrapped token
+		underlying_tokens[address(newToken)] = _underlying_token;
+    
+		wrapped_tokens[_underlying_token] = address(newToken);
+		
+    tokens.push(address(newToken));
+
 		// Emit Creation event
 		emit Creation(_underlying_token, address(newToken));
     
