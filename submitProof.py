@@ -5,8 +5,6 @@ import json
 from pathlib import Path
 from web3 import Web3
 from web3.middleware import geth_poa_middleware  # Necessary for POA chains
-import hashlib
-from pymerkletools import MerkleTools
 
 def merkle_assignment():
     """
