@@ -140,9 +140,11 @@ def sign_challenge(challenge):
     # TODO YOUR CODE HERE
     w3 = Web3()
 
-    signed_message = w3.eth.account.sign_message( challenge, private_key = acct._private_key)
+    eth_encoded_msg = eth_account.messages.encode_defunct(text=challenge)
 
-    return addr, signed_message.signature
+    signed_message = w3.eth.account.sign_message(eth_encoded_msg, private_key = eth_sk)
+
+    return addr, signed_message.signature.hex()
 
 
 def send_signed_msg(proof, random_leaf):
