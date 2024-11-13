@@ -79,6 +79,7 @@ contract AMM is AccessControl{
 
     uint256 new_invariant = ERC20(tokenA).balanceOf(address(this)) * ERC20(tokenB).balanceOf(address(this));
     require(new_invariant >= invariant, 'Bad trade');
+    
     uint256 buyAmount = qtyBuy - ((qtyA * qtyB) / new_invariant);
 
     require(buyAmount > 0, 'Insufficient liquidity or price impact too high');
