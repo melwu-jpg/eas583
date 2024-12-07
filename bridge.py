@@ -105,7 +105,8 @@ def scanBlocks(chain):
 
     #Get events in the filter
     # while True:
-    events = event_filter.get_new_entries()
+    events = event_filter.get_all_entries()
+
     # print(events)
     if events:
         for event in events:
