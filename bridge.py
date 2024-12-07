@@ -66,10 +66,10 @@ def scanBlocks(chain):
         contract = w3.eth.contract(address=contract_info['address'],abi=contract_info['abi'])
 
         #Scan the 5 blocks
-        latest_block = w3.eth.block_number #gets the last block?
-        start_block = latest_block - 5
-        event_filter = contract.events.Deposit.create_filter(fromBlock = start_block, toBlock = 'latest')
-
+        # latest_block = w3.eth.block_number #gets the last block?
+        # start_block = latest_block - 5
+        # event_filter = contract.events.Deposit.create_filter(fromBlock = start_block, toBlock = 'latest')
+        event_filter = contract.events.Deposit
 
     if chain == 'destination':
         w3 = connectTo(destination_chain)
@@ -81,9 +81,10 @@ def scanBlocks(chain):
         contract = w3.eth.contract(address=contract_info['address'],abi=contract_info['abi'])
 
         #Scan the 5 blocks
-        latest_block = w3.eth.block_number #gets the last block?
-        start_block = latest_block - 5
-        event_filter = contract.events.Unwrap.create_filter(fromBlock = start_block, toBlock = 'latest')
+        # latest_block = w3.eth.block_number #gets the last block?
+        # start_block = latest_block - 5
+        # event_filter = contract.events.Unwrap.create_filter(fromBlock = start_block, toBlock = 'latest')
+        event_filter = contract.events.Unwrap
 
     #Get events in the filter
     # while True:
@@ -93,9 +94,6 @@ def scanBlocks(chain):
         for event in events:
             action_function(event, contract_info)
             
-    
-    
-    
     # time.sleep(8)
 
 
