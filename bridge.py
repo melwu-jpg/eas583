@@ -69,8 +69,8 @@ def scanBlocks(chain):
         event_filter = contract.events.Deposit.create_filter(fromBlock = start_block, toBlock = 'latest')
         events = event_filter.get_all_entries()
         if events:
-        for event in events:
-            wrap(event, contract_info)
+            for event in events:
+                wrap(event, contract_info)
 
     if chain == 'destination':
         w3 = connectTo(destination_chain)
@@ -84,8 +84,8 @@ def scanBlocks(chain):
         events = event_filter.get_all_entries()
 
         if events:
-        for event in events:
-            withdraw(event, contract_info)
+            for event in events:
+                withdraw(event, contract_info)
             
 def wrap(event, contract_info):
     w3 = connectTo(destination_chain)
