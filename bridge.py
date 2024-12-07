@@ -59,22 +59,30 @@ def scanBlocks(chain):
     if chain == 'source':
         w3 = connectTo(source_chain)
         contract_info = getContractInfo('source')
-        event_name = 'deposit'
+        # event_name = 'deposit'
         action_function = wrap
+        #Access the contract
+        contract = w3.eth.contract(address=contract_info['address'],abi=contract_info['abi'])
+
+        #Scan the 5 blocks
+        latest_block = w3.eth.block_number #gets the last block?
+        start_block = latest_block - 5
+        event_filter = contract.events.deposit.create_filter(fromBlock = start_block, toBlock = 'latest')
+
 
     if chain == 'destination':
         w3 = connectTo(destination_chain)
         contract_info = getContractInfo('destination')
-        event_name = 'unwrap'
+        # event_name = 'unwrap'
         action_function = withdraw
     
-    #Access the contract
-    contract = w3.eth.contract(address=contract_info['address'],abi=contract_info['abi'])
+        #Access the contract
+        contract = w3.eth.contract(address=contract_info['address'],abi=contract_info['abi'])
 
-    #Scan the 5 blocks
-    latest_block = w3.eth.block_number #gets the last block?
-    start_block = latest_block - 5
-    event_filter = contract.events.event_name.create_filter(fromBlock = start_block, toBlock = 'latest')
+        #Scan the 5 blocks
+        latest_block = w3.eth.block_number #gets the last block?
+        start_block = latest_block - 5
+        event_filter = contract.events.unwrap.create_filter(fromBlock = start_block, toBlock = 'latest')
 
     #Get events in the filter
     while True:
