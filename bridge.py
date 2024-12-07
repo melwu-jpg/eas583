@@ -61,63 +61,32 @@ def scanBlocks(chain):
     if chain == 'source':
         w3 = connectTo(source_chain)
         contract_info = getContractInfo('source')
-        # event_name = 'deposit'
-        action_function = wrap
         #Access the contract
         contract = w3.eth.contract(address=contract_info['address'],abi=contract_info['abi'])
-
-        #Scan the 5 blocks
-        # if start_block == "latest":
-        #     start_block = w3.eth.get_block_number()
-        # if end_block == "latest":
-        #     end_block = w3.eth.get_block_number()
-
-        # if end_block - start_block < 5:
-        #     event_filter = contract.events.Deposit.create_filter(fromBlock=start_block,toBlock=end_block,argument_filters=arg_filter)
-        #     events = event_filter.get_all_entries()
 
         latest_block = w3.eth.block_number #gets the last block?
         start_block = latest_block - 5
         event_filter = contract.events.Deposit.create_filter(fromBlock = start_block, toBlock = 'latest')
+        events = event_filter.get_all_entries()
+        if events:
+        for event in events:
+            wrap(event, contract_info)
 
     if chain == 'destination':
         w3 = connectTo(destination_chain)
-        contract_info = getContractInfo('destination')
-        # event_name = 'unwrap'
-        action_function = withdraw
-    
+        contract_info = getContractInfo('destination')    
         #Access the contract
         contract = w3.eth.contract(address=contract_info['address'],abi=contract_info['abi'])
-
-        # if start_block == "latest":
-        #     start_block = w3.eth.get_block_number()
-        # if end_block == "latest":
-        #     end_block = w3.eth.get_block_number()
-
-        # if end_block - start_block < 5:
-        #     event_filter = contract.events.Unwrap.create_filter(fromBlock=start_block,toBlock=end_block,argument_filters=arg_filter)
-        #     events = event_filter.get_all_entries()
-
         #Scan the 5 blocks
         latest_block = w3.eth.block_number #gets the last block?
         start_block = latest_block - 5
         event_filter = contract.events.Unwrap.create_filter(fromBlock = start_block, toBlock = 'latest')
+        events = event_filter.get_all_entries()
 
-    #Get events in the filter
-    # while True:
-    events = event_filter.get_all_entries()
-
-    # print(events)
-    if events:
+        if events:
         for event in events:
-            action_function(event, contract_info)
+            withdraw(event, contract_info)
             
-    # time.sleep(8)
-
-
-# def deployRegisterToken():
-#     source_contract = connect_to('avax').eth.contract('xxx',abi='xxx')
-
 def wrap(event, contract_info):
     w3 = connectTo(destination_chain)
     contract = w3.eth.contract(address=contract_info['address'],abi=contract_info['abi'])
