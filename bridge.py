@@ -2,6 +2,7 @@ from web3 import Web3
 from web3.contract import Contract
 from web3.providers.rpc import HTTPProvider
 from web3.middleware import geth_poa_middleware #Necessary for POA chains
+import time
 import json
 import sys
 from pathlib import Path
