@@ -88,9 +88,11 @@ def scanBlocks(chain):
     #Get events in the filter
     # while True:
     events = event_filter.get_new_entries()
+    print(events)
     if events:
         for event in events:
             action_function(event, contract_info)
+            
     
     
     
