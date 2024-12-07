@@ -86,12 +86,15 @@ def scanBlocks(chain):
         event_filter = contract.events.Unwrap.create_filter(fromBlock = start_block, toBlock = 'latest')
 
     #Get events in the filter
-    while True:
-      events = event_filter.get_new_entries()
-      if events:
+    # while True:
+    events = event_filter.get_new_entries()
+    if events:
         for event in events:
-          action_function(event, contract_info)
-      time.sleep(8)
+            action_function(event, contract_info)
+    
+    
+    
+    # time.sleep(8)
 
 
 # def deployRegisterToken():
