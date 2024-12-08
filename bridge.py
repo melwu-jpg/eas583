@@ -125,27 +125,14 @@ def withdraw(event, contract_info):
     withdraw_function = contract.functions.withdraw(wrapped_token, to, amount)
 
     private_key = "0x8bd9c9a722284277bfb283491035f3b83d1b53d08a4a86d4e5f7533d20859272" 
-    warden_address = get_warden_address()
-    
+    acct = w3.eth.account.from_key(private_key)
+
     tx = withdraw_function.build_transaction({
         'gas': 2000000,
         'gasPrice': w3.to_wei('5', 'gwei'),
         'nonce': w3.eth.get_transaction_count(warden_address),
-        'from': warden_address
+        'from': acct.address
     })
     signed_tx = w3.eth.account.sign_transaction(tx, private_key)
     tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
 
-def get_warden_address():
-    w3 = connectTo(source_chain)
-    contract = w3.eth.contract(address=contract_info['address'], abi=contract_info['abi'])
-
-    warden_role = contract.functions.WARDEN_ROLE().call()
-
-    accounts = web3.eth.accounts 
-    
-    for account in accounts:
-        has_role = contract.functions.hasRole(warden_role, account).call()
-        if has_role:
-            return account  
-    return None
