@@ -70,6 +70,7 @@ def scanBlocks(chain):
         events = event_filter.get_all_entries()
         if events:
           for event in events:
+            contract_info = getContractInfo('destination')
             wrap(event, contract_info)
 
     if chain == 'destination':
@@ -85,6 +86,7 @@ def scanBlocks(chain):
 
         if events:
           for event in events:
+            contract_info = getContractInfo('source')
             withdraw(event, contract_info)
 
 
