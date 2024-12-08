@@ -69,8 +69,8 @@ def scanBlocks(chain):
         event_filter = contract.events.Deposit.create_filter(fromBlock = start_block, toBlock = 'latest')
         events = event_filter.get_all_entries()
         if events:
-            for event in events:
-                wrap(event, contract_info)
+          for event in events:
+            wrap(event, contract_info)
 
     if chain == 'destination':
         w3 = connectTo(destination_chain)
@@ -84,25 +84,30 @@ def scanBlocks(chain):
         events = event_filter.get_all_entries()
 
         if events:
-            for event in events:
-                withdraw(event, contract_info)
-            
+          for event in events:
+            withdraw(event, contract_info)
+
+
 def wrap(event, contract_info):
     w3 = connectTo(destination_chain)
     contract = w3.eth.contract(address=contract_info['address'],abi=contract_info['abi'])
 
+    underlying_token = event.args['token']
+    recipient = event.args['recipient']
+    amount = event.args['amount']
+    
+    wrap_function = contract.functions.wrap(underlying_token, recipient, amount)
+
+    warden_address = contract_info['WARDEN_ROLE'] 
+    private_key = "0x8bd9c9a722284277bfb283491035f3b83d1b53d08a4a86d4e5f7533d20859272"
 
     wrap_function = contract.functions.wrap(
         event.args['amount'], event.args['from'], event.args['token']
     )
 
-    warden_address = contract_info['WARDEN_ROLE']
-    private_key = "0x8bd9c9a722284277bfb283491035f3b83d1b53d08a4a86d4e5f7533d20859272" 
-    # acct = w3.eth.account.privateKeyToAccount(private_key)
     acct = source_w3.eth.account.from_key(private_key)
 
-    tx = contract.functions.wrap(proof, random_leaf).build_transaction({
-        'chainId': 97, 
+    tx = contract.functions.wrap(_underlying_token, _recipient, _amount).build_transaction({
         'gas': 2000000,
         'gasPrice': w3.to_wei('5', 'gwei'),
         'nonce': w3.eth.get_transaction_count(acct.address),
@@ -117,9 +122,13 @@ def withdraw(event, contract_info):
     w3 = connectTo(source_chain)
     contract = w3.eth.contract(address=contract_info['address'], abi=contract_info['abi'])
 
-    withdraw_function = contract.functions.withdraw(
-        event.args['amount'], event.args['to'], event.args['token']
-    )
+    wrapped_token = event.args['wrapped_token']
+    to = event.args['to']
+    amount = event.args['amount']
+
+
+    withdraw_function = contract.functions.withdraw(wrapped_token, to, amount)
+
 
     warden_address = contract_info['WARDEN_ROLE']
     private_key = "0x8bd9c9a722284277bfb283491035f3b83d1b53d08a4a86d4e5f7533d20859272" 
