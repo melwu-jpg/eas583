@@ -88,7 +88,6 @@ def scanBlocks(chain):
           contract_info = getContractInfo('source')
           for event in events:
             withdraw(event, contract_info)
-            tx["nonce"] = destination_w3.eth.get_transaction_count(acct.address)
 
 
 def wrap(event, contract_info):
@@ -136,3 +135,5 @@ def withdraw(event, contract_info):
     })
     signed_tx = w3.eth.account.sign_transaction(tx, private_key)
     tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
+
+    tx["nonce"] = destination_w3.eth.get_transaction_count(acct.address)
