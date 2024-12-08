@@ -130,7 +130,7 @@ def withdraw(event, contract_info):
     tx = withdraw_function.build_transaction({
         'gas': 2000000,
         'gasPrice': w3.to_wei('5', 'gwei'),
-        'nonce': w3.eth.get_transaction_count(warden_address),
+        'nonce': w3.eth.get_transaction_count(acct.address),
         'from': acct.address
     })
     signed_tx = w3.eth.account.sign_transaction(tx, private_key)
