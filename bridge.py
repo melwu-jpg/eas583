@@ -118,11 +118,12 @@ def withdraw(event, contract_info):
     w3 = connectTo(source_chain)
     contract = w3.eth.contract(address=contract_info['address'], abi=contract_info['abi'])
 
-    wrapped_token = event.args['wrapped_token']
+    # wrapped_token = event.args['wrapped_token']
+    underlying_token = event.args['token']
     to = event.args['to']
     amount = event.args['amount']
 
-    withdraw_function = contract.functions.withdraw(wrapped_token, to, amount)
+    withdraw_function = contract.functions.withdraw(underlying_token, to, amount)
 
     private_key = "0x8bd9c9a722284277bfb283491035f3b83d1b53d08a4a86d4e5f7533d20859272" 
     acct = w3.eth.account.from_key(private_key)
