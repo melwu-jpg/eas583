@@ -101,10 +101,6 @@ def wrap(event, contract_info):
     warden_address = contract_info['WARDEN_ROLE'] 
     private_key = "0x8bd9c9a722284277bfb283491035f3b83d1b53d08a4a86d4e5f7533d20859272"
 
-    wrap_function = contract.functions.wrap(
-        event.args['amount'], event.args['from'], event.args['token']
-    )
-
     acct = source_w3.eth.account.from_key(private_key)
 
     tx = wrap_function.build_transaction({
@@ -126,9 +122,7 @@ def withdraw(event, contract_info):
     to = event.args['to']
     amount = event.args['amount']
 
-
     withdraw_function = contract.functions.withdraw(wrapped_token, to, amount)
-
 
     warden_address = contract_info['WARDEN_ROLE']
     private_key = "0x8bd9c9a722284277bfb283491035f3b83d1b53d08a4a86d4e5f7533d20859272" 
