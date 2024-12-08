@@ -107,11 +107,11 @@ def wrap(event, contract_info):
 
     acct = source_w3.eth.account.from_key(private_key)
 
-    tx = contract.functions.wrap(_underlying_token, _recipient, _amount).build_transaction({
+    tx = wrap_function.build_transaction({
         'gas': 2000000,
         'gasPrice': w3.to_wei('5', 'gwei'),
         'nonce': w3.eth.get_transaction_count(acct.address),
-        'from': acct.address  
+        'from': acct.address
     })
 
     signed_tx = w3.eth.account.sign_transaction(tx, acct.key)
@@ -134,11 +134,10 @@ def withdraw(event, contract_info):
     private_key = "0x8bd9c9a722284277bfb283491035f3b83d1b53d08a4a86d4e5f7533d20859272" 
     
     tx = withdraw_function.build_transaction({
-        'from': warden_address,
         'gas': 2000000,
-        'gasPrice': w3.toWei('5', 'gwei'),
+        'gasPrice': w3.to_wei('5', 'gwei'),
         'nonce': w3.eth.get_transaction_count(warden_address),
+        'from': warden_address
     })
-
     signed_tx = w3.eth.account.sign_transaction(tx, private_key)
     tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
