@@ -69,8 +69,8 @@ def scanBlocks(chain):
         event_filter = contract.events.Deposit.create_filter(fromBlock = start_block, toBlock = 'latest')
         events = event_filter.get_all_entries()
         if events:
+          contract_info = getContractInfo('destination')
           for event in events:
-            contract_info = getContractInfo('destination')
             wrap(event, contract_info)
 
     if chain == 'destination':
@@ -85,8 +85,8 @@ def scanBlocks(chain):
         events = event_filter.get_all_entries()
 
         if events:
+          contract_info = getContractInfo('source')
           for event in events:
-            contract_info = getContractInfo('source')
             withdraw(event, contract_info)
 
 
@@ -100,9 +100,8 @@ def wrap(event, contract_info):
     
     wrap_function = contract.functions.wrap(underlying_token, recipient, amount)
 
-    warden_address = contract_info['WARDEN_ROLE'] 
     private_key = "0x8bd9c9a722284277bfb283491035f3b83d1b53d08a4a86d4e5f7533d20859272"
-
+    warden_address = get_warden_address()
     acct = source_w3.eth.account.from_key(private_key)
 
     tx = wrap_function.build_transaction({
@@ -126,8 +125,8 @@ def withdraw(event, contract_info):
 
     withdraw_function = contract.functions.withdraw(wrapped_token, to, amount)
 
-    warden_address = contract_info['WARDEN_ROLE']
     private_key = "0x8bd9c9a722284277bfb283491035f3b83d1b53d08a4a86d4e5f7533d20859272" 
+    warden_address = get_warden_address()
     
     tx = withdraw_function.build_transaction({
         'gas': 2000000,
@@ -137,3 +136,14 @@ def withdraw(event, contract_info):
     })
     signed_tx = w3.eth.account.sign_transaction(tx, private_key)
     tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
+
+def get_warden_address():
+    warden_role = contract.functions.WARDEN_ROLE().call()
+
+    accounts = web3.eth.accounts 
+    
+    for account in accounts:
+        has_role = contract.functions.hasRole(warden_role, account).call()
+        if has_role:
+            return account  
+    return None
