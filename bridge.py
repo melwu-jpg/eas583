@@ -101,7 +101,7 @@ def wrap(event, contract_info):
     wrap_function = contract.functions.wrap(underlying_token, recipient, amount)
 
     private_key = "0x8bd9c9a722284277bfb283491035f3b83d1b53d08a4a86d4e5f7533d20859272"
-    acct = source_w3.eth.account.from_key(private_key)
+    acct = w3.eth.account.from_key(private_key)
 
     tx = wrap_function.build_transaction({
         'gas': 2000000,
