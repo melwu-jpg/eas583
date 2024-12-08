@@ -101,7 +101,6 @@ def wrap(event, contract_info):
     wrap_function = contract.functions.wrap(underlying_token, recipient, amount)
 
     private_key = "0x8bd9c9a722284277bfb283491035f3b83d1b53d08a4a86d4e5f7533d20859272"
-    warden_address = get_warden_address()
     acct = source_w3.eth.account.from_key(private_key)
 
     tx = wrap_function.build_transaction({
@@ -138,6 +137,9 @@ def withdraw(event, contract_info):
     tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
 
 def get_warden_address():
+    w3 = connectTo(source_chain)
+    contract = w3.eth.contract(address=contract_info['address'], abi=contract_info['abi'])
+
     warden_role = contract.functions.WARDEN_ROLE().call()
 
     accounts = web3.eth.accounts 
